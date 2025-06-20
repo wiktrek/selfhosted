@@ -1,0 +1,5 @@
+services:
+  global_checkbox:
+    build: .
+    ports:
+      - "8000:3000"
