@@ -7,7 +7,7 @@ Bun.serve({
   port: 3000,
   fetch(req, server) {
     const url = new URL(req.url);
-
+    console.log("URL received:", url);
     if (url.pathname === "/") {
       return new Response(
         ` 
