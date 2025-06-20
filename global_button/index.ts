@@ -21,7 +21,7 @@ Bun.serve({
 
           <script>
             const checkbox = document.getElementById("checkbox");
-            const ws = new WebSocket("ws://" + location.host + "/ws");
+            const ws = new WebSocket("ws://" + location.host + "/global_button/ws");
 
             ws.onmessage = (event) => {
               const { state } = JSON.parse(event.data);
