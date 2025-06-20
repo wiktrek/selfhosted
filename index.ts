@@ -1,56 +1,77 @@
 import Fastify from "fastify";
 import websocket from "@fastify/websocket";
+import { WebSocket } from "ws";
 
+const fastify = Fastify();
 let current_state = false;
-const clients = new Set();
 
-const fastify = Fastify({
-  logger: false,
-});
+const clients = new Set<WebSocket>();
 
 fastify.register(websocket);
 
-fastify.get("/", function (req, res) {
-  const html = `
+fastify.get("/", async (req, res) => {
+  res.type("text/html").send(`
     <!DOCTYPE html>
     <html>
-    <head>
-      <title>Global button</title>
-    </head>
     <body>
-        <input type="checkbox" id="checkbox" checked=${current_state}>Global button</input>
-        <script>
-            const checkbox = document.getElementById("checkbox")
-            checkbox.addEventListener("click", () => {
-                console.log(checkbox.checked)
-            fetch("/change", {
-                method: "POST",
-                body: JSON.stringify({
-                    state: checkbox.checked    
-                }),
-                headers: {
-                    "Content-type": "application/json; charset=UTF-8"
-                }
-                })
-                .then((response) => console.log(response))
-            })
-            
-        </script>
+      <label>
+        <input type="checkbox" id="checkbox" />
+        Global Button
+      </label>
+
+      <script>
+        const checkbox = document.getElementById("checkbox");
+        const ws = new WebSocket((location.protocol === "https:" ? "wss://" : "ws://") + location.host + "/ws");
+
+        ws.onmessage = (msg) => {
+          const { state } = JSON.parse(msg.data);
+          checkbox.checked = state;
+        };
+
+        checkbox.addEventListener("change", () => {
+          fetch("/change", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ state: checkbox.checked })
+          });
+        });
+      </script>
     </body>
     </html>
-  `;
-  res.type("text/html").send(html);
+  `);
 });
-fastify.post("/change", (req, res) => {
-  const { state } = req.body;
-  current_state = state;
-  console.log(current_state);
-  res.status(200).send("OK");
-});
-fastify.listen({ port: 3000 }, function (err, address) {
-  if (err) {
-    fastify.log.error(err);
-    process.exit(1);
+
+fastify.post("/change", async (req, res) => {
+  const body = (await req.body) as { state: boolean };
+  if (typeof body.state !== "boolean") {
+    return res.status(400).send("Invalid");
   }
-  console.log(`Server listening at ${address}`);
+
+  current_state = body.state;
+
+  for (const client of clients) {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(JSON.stringify({ state: current_state }));
+    }
+  }
+
+  res.send("OK");
+});
+
+fastify.get("/ws", { websocket: true }, (connection, req) => {
+  const socket = connection.socket as WebSocket;
+
+  clients.add(socket);
+  console.log("Client connected. Total clients:", clients.size);
+
+  socket.send(JSON.stringify({ state: current_state }));
+
+  socket.on("close", () => {
+    clients.delete(socket);
+    console.log("Client disconnected. Total clients:", clients.size);
+  });
+});
+
+fastify.listen({ port: 3000 }, () => {
+  console.log("Server running at http://localhost:3000");
 });
