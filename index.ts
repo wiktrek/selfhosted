@@ -1,77 +1,96 @@
-import Fastify from "fastify";
-import websocket from "@fastify/websocket";
-import { WebSocket } from "ws";
+import { ServerWebSocket } from "bun";
 
-const fastify = Fastify();
-let current_state = false;
+let currentState = false;
+const clients = new Set<ServerWebSocket<unknown>>();
 
-const clients = new Set<WebSocket>();
+Bun.serve({
+  port: 3000,
+  fetch(req, server) {
+    const url = new URL(req.url);
 
-fastify.register(websocket);
+    if (url.pathname === "/") {
+      return new Response(
+        ` 
+        <!DOCTYPE html>
+        <html>
+        <body>
+          <label>
+            <input type="checkbox" id="checkbox" />
+            Global Button
+          </label>
 
-fastify.get("/", async (req, res) => {
-  res.type("text/html").send(`
-    <!DOCTYPE html>
-    <html>
-    <body>
-      <label>
-        <input type="checkbox" id="checkbox" />
-        Global Button
-      </label>
+          <script>
+            const checkbox = document.getElementById("checkbox");
+            const ws = new WebSocket("ws://" + location.host + "/ws");
 
-      <script>
-        const checkbox = document.getElementById("checkbox");
-        const ws = new WebSocket((location.protocol === "https:" ? "wss://" : "ws://") + location.host + "/ws");
+            ws.onmessage = (event) => {
+              const { state } = JSON.parse(event.data);
+              checkbox.checked = state;
+            };
 
-        ws.onmessage = (msg) => {
-          const { state } = JSON.parse(msg.data);
-          checkbox.checked = state;
-        };
-
-        checkbox.addEventListener("change", () => {
-          fetch("/change", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ state: checkbox.checked })
-          });
-        });
-      </script>
-    </body>
-    </html>
-  `);
-});
-
-fastify.post("/change", async (req, res) => {
-  const body = (await req.body) as { state: boolean };
-  if (typeof body.state !== "boolean") {
-    return res.status(400).send("Invalid");
-  }
-
-  current_state = body.state;
-
-  for (const client of clients) {
-    if (client.readyState === WebSocket.OPEN) {
-      client.send(JSON.stringify({ state: current_state }));
+            checkbox.addEventListener("change", () => {
+              fetch("/change", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ state: checkbox.checked })
+              });
+            });
+          </script>
+        </body>
+        </html>
+        `,
+        { headers: { "Content-Type": "text/html" } }
+      );
     }
-  }
 
-  res.send("OK");
+    if (url.pathname === "/change" && req.method === "POST") {
+      return req.json().then((body) => {
+        if (typeof body.state !== "boolean") {
+          return new Response("Invalid", { status: 400 });
+        }
+
+        currentState = body.state;
+
+        // Notify all connected clients
+        for (const client of clients) {
+          if (client.readyState === 1) {
+            client.send(JSON.stringify({ state: currentState }));
+          }
+        }
+
+        return new Response("OK");
+      });
+    }
+
+    // Upgrade to WebSocket
+    if (url.pathname === "/ws") {
+      if (server.upgrade(req)) {
+        return; // upgrade successful
+      }
+      return new Response("WebSocket upgrade failed", { status: 400 });
+    }
+
+    return new Response("Not found", { status: 404 });
+  },
+
+  websocket: {
+    open(ws) {
+      clients.add(ws);
+      console.log("Client connected, total:", clients.size);
+
+      ws.send(JSON.stringify({ state: currentState }));
+    },
+
+    close(ws) {
+      clients.delete(ws);
+      console.log("Client disconnected, total:", clients.size);
+    },
+
+    message(ws, message) {
+      // Not used, but you could allow clients to toggle state from here
+      console.log("Client message:", message);
+    },
+  },
 });
 
-fastify.get("/ws", { websocket: true }, (connection, req) => {
-  const socket = connection.socket as WebSocket;
-
-  clients.add(socket);
-  console.log("Client connected. Total clients:", clients.size);
-
-  socket.send(JSON.stringify({ state: current_state }));
-
-  socket.on("close", () => {
-    clients.delete(socket);
-    console.log("Client disconnected. Total clients:", clients.size);
-  });
-});
-
-fastify.listen({ port: 3000 }, () => {
-  console.log("Server running at http://localhost:3000");
-});
+console.log("✅ Bun server running on http://localhost:3000");
