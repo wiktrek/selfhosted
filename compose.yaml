@@ -1,5 +1,11 @@
+version: "3.8"
+
 services:
-  global_checkbox:
-    build: .
+  bun-app:
+    image: oven/bun:alpine
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: bun index.ts
     ports:
-      - "8000:3000"
+      - "3000:3000"
