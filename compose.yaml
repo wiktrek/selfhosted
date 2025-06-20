@@ -1,11 +1,11 @@
 version: "3.8"
 
 services:
-  bun-app:
+  global_buttons:
     image: oven/bun:alpine
     working_dir: /app
     volumes:
-      - .:/app
+      - /home/user/selfhosted/global_button:/app
     command: bun index.ts
     ports:
       - "3000:3000"
