@@ -1,0 +1,7 @@
+p {
+  display: flex;
+  text-align: center;
+  justify-content: center;
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-size: 2rem;
+}
