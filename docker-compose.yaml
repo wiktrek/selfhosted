@@ -5,7 +5,7 @@ services:
     image: oven/bun:alpine
     working_dir: /app
     volumes:
-      - /home/user/selfhosted/global_button:/app
+      - ./global_button:/app
     command: bun index.ts
     ports:
       - "3001:3000"
@@ -13,7 +13,7 @@ services:
     image: oven/bun:alpine
     working_dir: /app
     volumes:
-      - /home/user/selfhosted/main:/app
+      - ./main:/app
     command: bun index.ts
     ports:
       - "3002:3000"
