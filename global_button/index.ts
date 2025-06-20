@@ -29,7 +29,7 @@ Bun.serve({
             };
 
             checkbox.addEventListener("change", () => {
-              fetch("/change", {
+              fetch("/global_button/change", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ state: checkbox.checked })
