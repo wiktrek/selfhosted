@@ -19,12 +19,9 @@ services:
       - "3012:3000"
   solid:
     image: oven/bun:alpine
-    working_dir: /app
-    volumes:
-      - ./solid:/app
-    command: bun run dev
+    context: ./solid
     ports:
-      - "3013:3000"
+      - "3013:80"
   cool_backend:
     build:
       context: ./cool_backend
