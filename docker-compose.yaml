@@ -19,7 +19,7 @@ services:
       - "3012:3000"
   solid:
     image: oven/bun:alpine
-    context: ./solid
+    build: ./solid
     ports:
       - "3013:80"
   cool_backend:
