@@ -17,6 +17,19 @@ services:
     command: bun index.ts
     ports:
       - "3012:3000"
+  solid:
+    image: oven/bun:alpine
+    working_dir: /app
+    volumes:
+      - ./solid:/app
+    command: bun run dev
+    ports:
+      - "3013:3000"
+  cool_backend:
+    build:
+      context: ./cool_backend
+    ports:
+      - "3014:8080"
   nginx:
     image: nginx:alpine
     ports:
@@ -26,3 +39,5 @@ services:
     depends_on:
       - main
       - global_button
+      - solid
+      - cool_backend
