@@ -2,8 +2,26 @@
 import "../styles/global.css";
 import { render, style } from "solid-js/web";
 const root = document.getElementById("root");
+interface Snake {
+  head: Point;
+  parts?: SnakePart[];
+}
+
+interface SnakePart {
+  position: Point;
+}
+interface Point {
+  x: number;
+  y: number;
+}
 const Home = () => {
   const grid_size = 9;
+  const snake = {
+    head: {
+      x: 0,
+      y: 0,
+    },
+  } as Snake;
   let is_apple = false;
   const Grid = (props: { size: number }) => {
     let elements = [];
