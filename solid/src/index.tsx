@@ -1,6 +1,6 @@
 /* @refresh reload */
 import "../styles/global.css";
-import { render } from "solid-js/web";
+import { render, style } from "solid-js/web";
 const root = document.getElementById("root");
 const Home = () => {
   const grid_size = 9;
@@ -13,7 +13,13 @@ const Home = () => {
     return (
       <>
         {elements.map((i) => (
-          <div class="border-2 w-16 h-16" id={`${i}`} />
+          <div
+            class="border-2 w-16 h-16"
+            style={{
+              "background-color": "lightgreen",
+            }}
+            id={`${i}`}
+          />
         ))}
       </>
     );
@@ -36,7 +42,7 @@ const Home = () => {
   }
   return (
     <>
-      <div class="flex justify-center text-center items-center text-3xl flex-col">
+      <div class="flex justify-center text-center items-center text-3xl flex-col bg-slate-800 h-screen text-white">
         <h1>This is a snake app!</h1>
         <button onClick={spawn_snake}>Start</button>
         <div class="grid grid-cols-9 grid-rows-9 pt-4">
