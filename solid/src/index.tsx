@@ -2,6 +2,11 @@
 import { createSignal } from "solid-js/types/server/reactive.js";
 import "../styles/global.css";
 import { render, style } from "solid-js/web";
+/*
+
+  Move to solid start!!!!!!!!!
+  
+*/
 const root = document.getElementById("root");
 interface Snake {
   head: Point;
