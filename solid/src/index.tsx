@@ -1,4 +1,5 @@
 /* @refresh reload */
+import { createSignal } from "solid-js/types/server/reactive.js";
 import "../styles/global.css";
 import { render, style } from "solid-js/web";
 const root = document.getElementById("root");
@@ -16,6 +17,8 @@ interface Point {
 }
 const Home = () => {
   const grid_size = 9;
+  const [points, setPoints] = createSignal(0);
+  const [grid, setGrid] = createSignal([]);
   const snake = {
     head: {
       x: 0,
@@ -58,10 +61,18 @@ const Home = () => {
     random_element.style.backgroundColor = "red";
     is_apple = true;
   }
+  function eat_apple() {
+    /* 
+      code here
+    */
+
+    setPoints((prev) => prev + 1);
+  }
   return (
     <>
       <div class="flex justify-center text-center items-center text-3xl flex-col bg-slate-800 h-screen text-white">
         <h1>This is a snake app!</h1>
+        <p>Points: {points()}</p>
         <button onClick={spawn_snake}>Start</button>
         <div class="grid grid-cols-9 grid-rows-9 pt-4">
           <Grid size={grid_size} />
