@@ -15,8 +15,3 @@ body {
   color: var(--text);
   background-color: var(--background);
 }
-#main {
-  width: 80vh;
-  font-weight: 500;
-  font-size: 120%;
-}

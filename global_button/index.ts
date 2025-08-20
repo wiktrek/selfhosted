@@ -1,47 +1,19 @@
 import { ServerWebSocket } from "bun";
-
+import index from "./index.html";
 let currentState = false;
 const clients = new Set<ServerWebSocket<unknown>>();
 
 Bun.serve({
   port: 3000,
+  routes: {
+    "/": index,
+  },
   fetch(req, server) {
     const url = new URL(req.url);
     console.log("URL received:", url);
-    if (url.pathname === "/") {
-      return new Response(
-        ` 
-        <!DOCTYPE html>
-        <html>
-        <body>
-          <label>
-            <input type="checkbox" id="checkbox" />
-            Global Button
-          </label>
-
-          <script>
-            const checkbox = document.getElementById("checkbox");
-            const ws = new WebSocket("ws://" + location.host + "/global_button/ws");
-
-            ws.onmessage = (event) => {
-              const { state } = JSON.parse(event.data);
-              checkbox.checked = state;
-            };
-
-            checkbox.addEventListener("change", () => {
-              fetch("/global_button/change", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ state: checkbox.checked })
-              });
-            });
-          </script>
-        </body>
-        </html>
-        `,
-        { headers: { "Content-Type": "text/html" } }
-      );
-    }
+    // if (url.pathname === "/") {
+    //   return new Response(index, { headers: { "Content-Type": "text/html" } });
+    // }
 
     if (url.pathname === "/change" && req.method === "POST") {
       return req.json().then((body) => {

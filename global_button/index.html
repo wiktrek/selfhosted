@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>global button</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <label>
+      <input type="checkbox" id="checkbox" />
+      Global Button
+    </label>
+    <script>
+      const checkbox = document.getElementById("checkbox");
+      const ws = new WebSocket("ws://" + location.host + "/global_button/ws");
+
+      ws.onmessage = (event) => {
+        const { state } = JSON.parse(event.data);
+        checkbox.checked = state;
+      };
+
+      checkbox.addEventListener("change", () => {
+        fetch("/global_button/change", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ state: checkbox.checked }),
+        });
+      });
+    </script>
+  </body>
+</html>

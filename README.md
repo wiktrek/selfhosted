@@ -12,3 +12,5 @@ You check them out [here](https://self.wiktrek.xyz)
 
 - move to solid start (solid)
 - selfhost it
+
+Color palette: https://www.realtimecolors.com/?colors=f4efed-16100e-c8b0a6-526840-6ca268&fonts=Inter-Inter

@@ -1,7 +1,8 @@
 /* @refresh reload */
+import "./styles/global.css";
+import { render } from "solid-js/web";
 import { createSignal } from "solid-js/types/server/reactive.js";
 import "../styles/global.css";
-import { render, style } from "solid-js/web";
 /*
 
   Move to solid start!!!!!!!!!
