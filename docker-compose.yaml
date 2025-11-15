@@ -5,7 +5,7 @@ services:
     build: ./global_button
     container_name: global_button
     ports:
-      - "3001:3001"
+      - "3010:3001"
     networks:
       - selfhosted_network
 

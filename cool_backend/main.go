@@ -13,9 +13,11 @@ func main() {
 	h2 := func(w http.ResponseWriter, _ *http.Request) {
 		io.WriteString(w, "Hello from a HandleFunc #2!\n")
 	}
-
+	go handleMessages()
 	http.HandleFunc("/", h1)
+	http.HandleFunc("/ws", wsHandler)
 	http.HandleFunc("/endpoint", h2)
+
 	print("Starting server at http://127.0.0.1:8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
