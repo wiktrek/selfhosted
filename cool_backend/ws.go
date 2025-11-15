@@ -12,7 +12,7 @@ import (
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
 		fmt.Println(r.Host)
-		if r.Host != "https://wiktrek.xyz" {
+		if r.Host != "https://project.wiktrek.xyz" && r.Host != "https://wiktrek.xyz" {
 			return false
 		}
 		return true
