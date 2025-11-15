@@ -10,7 +10,7 @@ Bun.serve({
   },
   fetch(req, server) {
     const url = new URL(req.url);
-    console.log("URL received:", url);
+    // console.log("URL received:", url);
     // if (url.pathname === "/") {
     //   return new Response(index, { headers: { "Content-Type": "text/html" } });
     // }
@@ -48,19 +48,19 @@ Bun.serve({
   websocket: {
     open(ws) {
       clients.add(ws);
-      console.log("Client connected, total:", clients.size);
+      // console.log("Client connected, total:", clients.size);
 
       ws.send(JSON.stringify({ state: currentState }));
     },
 
     close(ws) {
       clients.delete(ws);
-      console.log("Client disconnected, total:", clients.size);
+      // console.log("Client disconnected, total:", clients.size);
     },
 
     message(ws, message) {
       // Not used, but you could allow clients to toggle state from here
-      console.log("Client message:", message);
+      // console.log("Client message:", message);
     },
   },
 });

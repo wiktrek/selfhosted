@@ -21,7 +21,7 @@ services:
     build: ./main
     container_name: main
     ports:
-      - "3000:3000"
+      - "3011:3000"
     networks:
       - selfhosted_network
 
@@ -29,7 +29,7 @@ services:
     build: ./solid
     container_name: solid
     ports:
-      - "3002:3002"
+      - "3012:3002"
     networks:
       - selfhosted_network
 
